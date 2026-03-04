@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; display: flex; color: #333; }
+        #sidebar { width: 300px; background: #f8f9fa; border-right: 1px solid #ddd; height: 100vh; overflow-y: auto; position: fixed; padding: 20px; box-sizing: border-box; }
+        #content { margin-left: 300px; padding: 40px; flex: 1; max-width: 1000px; }
+        h1 { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { margin-top: 50px; border-bottom: 1px solid #eee; padding-bottom: 10px; color: #444; }
+        .api-item { margin-bottom: 60px; }
+        .method { font-weight: bold; padding: 6px 12px; border-radius: 4px; color: white; display: inline-block; margin-right: 10px; font-size: 14px; text-transform: uppercase; }
+        .method.POST { background-color: #49cc90; }
+        .method.GET { background-color: #61affe; }
+        .method.PUT { background-color: #fca130; }
+        .method.DELETE { background-color: #f93e3e; }
+        .url { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; background: #f0f4f8; padding: 6px 10px; border-radius: 4px; color: #333; }
+        pre { background: #282c34; color: #abb2bf; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 13px; line-height: 1.5; }
+        .nav-link { display: block; padding: 6px 0; color: #555; text-decoration: none; font-size: 14px; }
+        .nav-link:hover { color: #007bff; text-decoration: underline; }
+        .category-title { font-weight: 700; margin-top: 20px; margin-bottom: 10px; color: #333; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        h3 { font-size: 16px; margin-top: 20px; margin-bottom: 10px; color: #666; }
+        ul { list-style-type: none; padding-left: 0; }
+        li { margin-bottom: 5px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <h3 style="margin-top:0">API Docs</h3>
+<div class="category-title">Public Category</div><a class="nav-link" href="#15841">Query Game Statistics Interface</a><a class="nav-link" href="#15833">Query Game Order Interface</a><a class="nav-link" href="#15849">Query Order Detail Interface</a><a class="nav-link" href="#15825">Check User Existence</a><a class="nav-link" href="#15785">Get Game URL</a><a class="nav-link" href="#15809">Get User Game Balance</a><a class="nav-link" href="#22701">Order Collection Interface</a><a class="nav-link" href="#15793">Transfer (Deposit/Credit)</a><a class="nav-link" href="#15801">Transfer (Withdraw/Debit)</a><a class="nav-link" href="#15817">Exit Game</a>
+    </div>
+    <div id="content">
+<h1>Public Category</h1>
+            <div class="api-item" id="15841">
+                <h2>Query Game Statistics Interface</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/order/stat</span>
+                </div>
+                <div class="description"></div>
+            <h3>Request Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.order.stat",
+  "params": {
+    "a0": 19191,// Root Node ID，Required
+    "userIds":[199817,12123],// User IDArray，Required
+    "currency":"RNB",// Currency，Required
+    "isSettle":0,// YesNoAlreadySettled 0 No 1Yes Optional
+    "state":[],// Status 0，1，2，3，4，5，7   Optional
+    "gameInfo":{
+         "category":"0",// Game Categoryid Required
+         "providerId":"1",// Game Providerid Required
+         "gameId":"101891"// Game ID Optional
+     },
+    "groupId":"DEF",// groupId DefaultDEF Optional
+    "beginTime":"YYYY-MM-DD HH:mm:ss",// Start Timestamp Required
+    "endTime":"YYYY-MM-DD HH:mm:ss",// End Timestamp Required
+    "timezone":0,// Singapore Time 0 ，Eastern Time 1 Required
+    "page":1,// Page Number Required
+    "size":100,// Item Count Required
+    "hasStat":0// YesNoNeed Total 0 No 1 Yes Required
+  }
+}</pre><h3>Response Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": {
+      "total":100,// Total Count
+      "totalBetScore":0,// Bet AmountTotal
+      "totalSettleScore":0,// SettledTotal Amount
+      "totalValidScore":0,// Total Valid Bet Amount
+      "list":[
+          {
+               "gameId":"1",// Game ID
+               "groupId":"1",// Roomid
+               "currency":"RMB",// Currency
+               "betScore":100.0,// Bet Amount
+               "settleScore":100.0,// Payout Amount
+               "validScore":100.0// Valid Bet Amount
+               "userId":100211// User ID
+          }
+     ]
+  
+   },
+  "error": null
+}</pre></div>
+            <div class="api-item" id="15833">
+                <h2>Query Game Order Interface</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/order/query</span>
+                </div>
+                <div class="description"></div>
+            <h3>Request Headers</h3><ul><li><b>token</b>: 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 <i style='color: #888; margin-left:10px;'></i></li></ul><h3>Request Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.order.query",
+  "params": {
+    "orderId":"1213123213",// Orderid，Optional
+    "a0": 19191,// Root Node ID，Required
+    "userId":199817,// User ID，Optional
+    "currency":"RNB",// Currency，Required
+    "state": [0],// Status 0 Unsettled，1 Win，2 Draw ， 3 Loss，4 User Cancelled ， 5 System Cancelled，7 Abnormal，Optional
+    "gameInfo":{
+         "category":"0",// Game Categoryid Required
+         "providerId":"1",// Game Providerid Required
+         "gameId":"101891"// Game ID Optional
+     },
+    "returnGameInfo":0,// YesNoReturnOrderDetails，0No1Yes Required
+    "groupId":"sdfs",// goupId,Default DEF Optional
+    "beginTime":"YYYY-MM-DD HH:mm:ss",// Start Timestamp Required
+    "endTime":"YYYY-MM-DD HH:mm:ss",// End Timestamp Required
+    "timeZone":0,// Singapore Time 0 ，Eastern Time 1 Required
+    "page":1,// Page Number Required
+    "size":100,// Item Count Required
+    "hasStat":0// YesNoNeed Total 0 No 1 Yes Required
+  }
+}</pre><h3>Response Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": {
+      "total":100,// Total Count
+      "totalBetScore":0,// Bet AmountTotal
+      "totalSettleScore":0,// SettledTotal Amount
+      "totalValidScore":0,// Total Valid Bet Amount
+      "list":[
+          {
+               "a0":"12313",// a0
+               "userId":"324324",// User ID
+               "gameId":"1",// Game ID
+               "orderId":"2342342",// Orderid
+               "currency":"RMB",// Currency
+               "betTime":"YYYY-MM-DD HH:mm:ss",// Bet Time
+               "state":1,// Status 0 Unsettled，1 Win，2 Draw ， 3 Loss，4 User Cancelled ， 5 System Cancelled，7 Abnormal
+               "betScore":100.0,// Bet Amount
+               "settleScore":100.0,// Payout Amount
+               "validScore":100.0,// Valid Bet Amount
+               "settleTime":"YYYY-MM-DD HH:mm:ss"// Settlement Time
+               "groupId":"2322",// Group ID
+               "isSettle":0// YesNoSettled 0 No 1Yes（IncludesstateYes1，2，3）
+               "gameInfo":{}
+          }
+     ]
+  
+   },
+  "error": null
+}</pre></div>
+            <div class="api-item" id="15849">
+                <h2>Query Order Detail Interface</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/order/detail</span>
+                </div>
+                <div class="description"></div>
+            <h3>Request Headers</h3><ul><li><b>token</b>: 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 <i style='color: #888; margin-left:10px;'></i></li></ul><h3>Request Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.order.detail",
+  "params": {
+    "orderId":"1213123213",// Orderid Required
+    "language":"CN",// Language
+    "currency":"CNY",// Currency Required
+    "gameInfo":{
+         "category":"0",// Game Categoryid  Required
+         "providerId":"1",// Game Providerid Required
+         "gameId":"101891"// Game ID Optional
+     }
+  }
+}</pre><h3>Response Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": "https:// sfdsfd.com"//Detail Query URL,
+  "error": null
+}</pre></div>
+            <div class="api-item" id="15825">
+                <h2>Check User Existence</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/user/exists</span>
+                </div>
+                <div class="description"></div>
+            <h3>Request Headers</h3><ul><li><b>token</b>: 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 <i style='color: #888; margin-left:10px;'></i></li></ul><h3>Request Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.user.exists",
+  "params": {
+    "a0": 19191,// Root Node ID，Required
+    "userId":199817,// User ID，Required
+    "device":"PC",// Terminal，Optional
+    "language":"CN",// Language，Optional
+    "currency":"RNB",// Currency，Optional
+    "gameInfo":{
+         "category":"0",// Game Categoryid，Required
+         "providerId":"1",// Game Providerid，Required
+         "gameId":"101891"// Game ID，Optional
+     }
+  }
+}</pre><h3>Response Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": true,
+  "error": null
+}</pre></div>
+            <div class="api-item" id="15785">
+                <h2>Get Game URL</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/url</span>
+                </div>
+                <div class="description"><p><span class="colour" style="color:rgb(0, 0, 0)"><strong>gameInfo Parameter Description</strong></span><br>
+"gameInfo":{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "category":"0",//Game Category ID, Required<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "providerId":"1",//Game Provider ID, Required<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "gameId":"101891"//Game ID，Must provide game type（BGFishing (Game)）<br>
+&nbsp;&nbsp;&nbsp;&nbsp; },</p>
+</div>
+            <h3>Request Headers</h3><ul><li><b>Content-Type</b>: application/json <i style='color: #888; margin-left:10px;'></i></li><li><b>token</b>: 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 <i style='color: #888; margin-left:10px;'>See generation method: https://pb-api-doc.pwtk.cc/project/253/wiki</i></li></ul><h3>Request Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.url",
+  "params": {
+    "token":"sdfdsfdsfsd",// User Token, Required
+    "device":"PC",// Terminal, Required
+    "language":"CN",// Language, Required
+    "currency":"RNB",// Currency, Required
+    "groupId":"1000",// Group ID，DefaultDEF，Optional，When isGroupTrace=1 is required
+    "isGroupTrace":0,// 0=No Tracking（Default），1=Tracking（Must Fill groupId）
+    "isDemo":0,// Is Demo 0No1Yes, Required
+    "gameInfo":{
+         "category":"0",// Game Category ID, Required
+         "providerId":"1",// Game Provider ID, Required
+         "gameId":"101891"// Game ID，Optional
+     },
+     "returnUrl":""// Return URL，Optional
+  }
+}</pre><h3>Response Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": {
+    "url": "https:// www.ddf.com",//Game Entry URL
+    "config": {}
+  },
+  "error": null
+}</pre></div>
+            <div class="api-item" id="15809">
+                <h2>Get User Game Balance</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/user/balance</span>
+                </div>
+                <div class="description"></div>
+            <h3>Request Headers</h3><ul><li><b>token</b>: 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 <i style='color: #888; margin-left:10px;'></i></li></ul><h3>Request Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.user.balance",
+  "params": {
+    "a0": 19191,// Root Node ID，Required
+    "userId":199817,// User ID，Required
+    "currency":"RNB",// Currency，Required
+    "gameInfo":{
+         "category":"0",// Game Categoryid，Optional
+         "providerId":"1",// Game Providerid，Required
+         "gameId":"101891"// Game ID，Optional
+     }
+  }
+}</pre><h3>Response Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": {
+    "score": 100.0// Balance
+  },
+  "error": null
+}</pre></div>
+            <div class="api-item" id="22701">
+                <h2>Order Collection Interface</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/order/collect</span>
+                </div>
+                <div class="description"><p>Request format is JSON-RPC<br>
+Reference<br>
+{</p>
+<p>"jsonrpc": "2.0",<br>
+&nbsp; "id": "req-001",<br>
+&nbsp; "method": "game.order.collect",<br>
+&nbsp; "params": {<br>
+&nbsp; }<br>
+}</p>
+<p><br data-tomark-pass=""><br>
+Result is paginated data<br>
+Data format follows JSON-RPC standard<br>
+{<br>
+&nbsp; "jsonrpc": "2.0",<br>
+&nbsp; "id": "req-001",<br>
+&nbsp; "result": ",<br>
+&nbsp; "error": null<br>
+}</p>
+<p><br data-tomark-pass=""><br>
+<br data-tomark-pass=""></p>
+</div>
+            <h3>Request Headers</h3><ul><li><b>Content-Type</b>: application/json <i style='color: #888; margin-left:10px;'></i></li></ul><h3>Request Body</h3><pre>{"$schema":"http:// json-schema.org/draft-04/schema#","type":"object","properties":{"startTime":{"type":"string"},"endTime":{"type":"string"},"pageNum":{"type":"number"},"pageSize":{"type":"number"},"providerId":{"type":"string"},"categoryId":{"type":"string"},"gameId":{"type":"string"},"timeZone":{"type":"number","description":"0 Beijing Time\n1 Eastern Time (US)"}},"required":[]}</pre><h3>Response Body</h3><pre>{"$schema":"http:// json-schema.org/draft-04/schema#","type":"object","properties":{"a0":{"type":"string"},"userId":{"type":"string"},"providerId":{"type":"string"},"categoryId":{"type":"string"},"gameId":{"type":"string"},"groupId":{"type":"string"},"orderId":{"type":"string"},"betScore":{"type":"string"},"effectScore":{"type":"string"},"settleScore":{"type":"string"},"status":{"type":"string"},"betTime":{"type":"string"},"settleTime":{"type":"string"},"gameInfo":{"type":"string"},"currency":{"type":"string"}}}</pre></div>
+            <div class="api-item" id="15793">
+                <h2>Transfer (Deposit/Credit)</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/transferToGame</span>
+                </div>
+                <div class="description"></div>
+            <h3>Request Headers</h3><ul><li><b>token</b>: 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 <i style='color: #888; margin-left:10px;'></i></li></ul><h3>Request Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.transferToGame",
+  "params": {
+    "a0": 19191,// Root Node ID，Required
+    "userId":199817,// User ID，Required
+    "device":"PC",// Terminal，Optional
+    "language":"CN",// Language，Optional
+    "currency":"RNB",// Currency，Required
+    "transactionId":"34234324324",// Transaction ID，Required
+    "gameInfo":{
+         "category":"0",// Game Categoryid，Optional
+         "providerId":"1",// Game Providerid，Required
+         "gameId":"101891"// Game ID，Optional
+     },
+    score:100// Transferred In Score，Required
+  }
+}</pre><h3>Response Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result":true,
+  "error": null
+}</pre></div>
+            <div class="api-item" id="15801">
+                <h2>Transfer (Withdraw/Debit)</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/transferFromGame</span>
+                </div>
+                <div class="description"></div>
+            <h3>Request Headers</h3><ul><li><b>token</b>: 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 <i style='color: #888; margin-left:10px;'></i></li></ul><h3>Request Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.transferFromGame",
+  "params": {
+    "a0": 19191,// Root Node ID，Required
+    "userId":199817,// User ID，Required
+    "device":"PC",// Terminal，Optional
+    "language":"CN",// Language，Optional
+    "currency":"RNB",// Currency，Required
+    "transactionId":"34234324324",// Transaction ID，Required
+    "gameInfo":{
+         "category":"0",// Game Categoryid，Optional
+         "providerId":"1",// Game Providerid，Required
+         "gameId":"101891"// Game ID，Optional
+     },
+    score:100// Transferred Score，Required
+  }
+}</pre><h3>Response Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": true,
+  "error": null
+}</pre></div>
+            <div class="api-item" id="15817">
+                <h2>Exit Game</h2>
+                <div style="margin-bottom: 15px;">
+                    <span class="method POST">POST</span>
+                    <span class="url">/game-proxy/game/exit</span>
+                </div>
+                <div class="description"></div>
+            <h3>Request Headers</h3><ul><li><b>token</b>: 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 <i style='color: #888; margin-left:10px;'></i></li></ul><h3>Request Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.user.exit",
+  "params": {
+    "a0": 19191,// Root Node ID，Required
+    "userId":199817,// User ID，Required
+    "device":"PC",// Terminal，Required
+    "language":"CN",// Language，Optional
+    "currency":"RNB",// Currency，Optional
+    "groupId":"were",// groupId,DefaultDEF，Optional
+    "gameInfo":{
+         "category":"0",// Game Categoryid，Required
+         "providerId":"1",// Game Providerid，Required
+         "gameId":"101891"// Game ID，Optional
+     }
+  }
+}</pre><h3>Response Body</h3><pre>{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": true,
+  "error": null
+}</pre></div>
+    </div>
+</body>
+</html>
