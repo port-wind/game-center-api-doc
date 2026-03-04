@@ -1,47 +1,47 @@
-# 游戏中心（Game Center）接入指南
+# Game Center Integration Guide
 
-**适用对象：** 客户端研发、服务端研发、测试人员  
-**更新日期：** 2026-03-04  
-**文档版本：** V1.0.0
-
----
-
-## 1. 前言
-
-本文通过标准化接口，实现游戏端与游戏中心（Game Center，简称 GC）的交互。主要功能包括：
-
-- 获取游戏链接
-- 登录认证
-- 用户信息、余额信息的获取
-- 扣减积分
-- 游戏记录查询
-
-## 2. 交互时序图
-
-![交互时序图](./images/pp.png)
-
-## 3. 接入流程概览
-
-1. **获取游戏链接**：Game Center 会通过游戏的 id 和用户登录 token 向游戏端 server 请求游戏链接地址。
-2. **打开游戏与验证**：用户通过游戏链接打开游戏，游戏端 server 需向 Game Center 发起请求验证用户 token，并获取用户名和头像信息。
-3. **获取余额**：游戏端 server 请求 Game Center 获取用户余额信息。
-4. **积分操作**：用户玩积分游戏时，游戏服务端向 Game Center 发起扣分/加分请求。
-5. **退出游戏**：用户退出游戏时，游戏服务端向 Game Center 发送游戏退出请求。
+**Target Audience:** Client developers, Server developers, QA  
+**Last Updated:** 2026-03-04  
+**Document Version:** V1.0.0
 
 ---
 
-## 4. Game Center API 接口说明（Public Category）
+## 1. Introduction
 
-### 4.1 User Token Validation（用户 Token 校验）
+This document describes the integration between the game side and Game Center (GC) via standardized APIs. Main features include:
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/user/token/check`
+- Get game URL
+- Login & authentication
+- Get user info and balance
+- Deduct / credit points
+- Game record query
+
+## 2. Interaction Sequence Diagram
+
+![Interaction Sequence Diagram](./images/pp.png)
+
+## 3. Integration Flow Overview
+
+1. **Get game URL:** Game Center requests the game URL from the game server using the game id and user login token.
+2. **Open game & verify:** The user opens the game via the URL; the game server must call Game Center to validate the user token and obtain username and avatar.
+3. **Get balance:** The game server requests the user balance from Game Center.
+4. **Credit operations:** When the user plays for points, the game server sends deduct/credit requests to Game Center.
+5. **Exit game:** When the user exits the game, the game server sends an exit request to Game Center.
+
+---
+
+## 4. Game Center API (Public Category)
+
+### 4.1 User Token Validation
+
+- **Method:** `POST`
+- **Path:** `/game-proxy/user/token/check`
 
 **Request Headers**
 
-| 参数   | 说明 |
-|--------|------|
-| token  | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3（Token secret: game-proxy-10086） |
+| Parameter | Description |
+|-----------|-------------|
+| token     | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 (Token secret: game-proxy-10086) |
 
 **Request Body**
 
@@ -51,7 +51,7 @@
   "id": "req-001",
   "method": "user.session.check",
   "params": {
-    "token": "sdfsdfsdfsdfss"
+    "token": "sdfsdfsdfsdfss"  // User token from frontend
   }
 }
 ```
@@ -64,30 +64,30 @@
   "id": "req-001",
   "method": "user.session.check",
   "result": {
-    "a0": 100841,
-    "userId": 100821,
-    "avatar": "https:// pbtest.buyacard.cc/img/user/avatar/a.png",
-    "nickname": "",
-    "gender": 1
+    "a0": 100841,  // Root agent
+    "userId": 100821,  // User ID
+    "avatar": "https:// pbtest.buyacard.cc/img/user/avatar/a.png",  // Avatar
+    "nickname": "",  // Nickname
+    "gender": 1  // Gender: 0 Unknown, 1 Male, 2 Female
   },
   "error": null
 }
 ```
 
-（gender：0 未知 / 1 男 / 2 女）
+(gender: 0 Unknown / 1 Male / 2 Female)
 
 ---
 
-### 4.2 User Score Change（用户积分变动）
+### 4.2 User Score Change
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/user/score/change`
+- **Method:** `POST`
+- **Path:** `/game-proxy/user/score/change`
 
 **Request Headers**
 
-| 参数   | 说明 |
-|--------|------|
-| token  | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
+| Parameter | Description |
+|-----------|-------------|
+| token     | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
 
 **Request Body**
 
@@ -97,20 +97,20 @@
   "id": "req-001",
   "method": "user.score.change",
   "params": {
-    "a0": 1008171,
-    "userId": 1019818,
-    "category": "0",
-    "providerId": "1",
-    "gameId": "181818",
-    "score": 999.00,
-    "transactionId": "23424324324",
-    "opType": "debit",
-    "currency": "RMB"
+    "a0": 1008171,  // Root agent
+    "userId": 1019818,  // User ID
+    "category": "0",  // Game category ID
+    "providerId": "1",  // Game provider ID
+    "gameId": "181818",  // Game ID
+    "score": 999.00,  // Score/points
+    "transactionId": "23424324324",  // Transaction ID
+    "opType": "debit",  // debit / credit / return (cancel-refund)
+    "currency": "GOLD"  // Currency: GOLD=free, VND/USD=real money
   }
 }
 ```
 
-（opType：debit / credit / return 取消退款）
+(opType: debit / credit / return for cancel-refund)
 
 **Response Body**
 
@@ -121,9 +121,9 @@
   "method": "user.score.change",
   "result": {
     "a0": 100841,
-    "userId": 100821,
-    "currency": "RMB",
-    "score": "100.00"
+    "userId": 100821,  // User ID
+    "currency": "GOLD",  // Currency
+    "score": "100.00"  // Amount
   },
   "error": null
 }
@@ -131,16 +131,16 @@
 
 ---
 
-### 4.3 User Exit（用户退出）
+### 4.3 User Exit
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/user/game/exit`
+- **Method:** `POST`
+- **Path:** `/game-proxy/user/game/exit`
 
 **Request Headers**
 
-| 参数   | 说明 |
-|--------|------|
-| token  | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
+| Parameter | Description |
+|-----------|-------------|
+| token     | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
 
 **Request Body**
 
@@ -150,11 +150,11 @@
   "id": "req-001",
   "method": "user.exit",
   "params": {
-    "a0": 1008171,
-    "userId": 1019818,
-    "category": "0",
-    "providerId": "1",
-    "gameId": "181818"
+    "a0": 1008171,  // Root agent
+    "userId": 1019818,  // User ID
+    "category": "0",  // Game category ID
+    "providerId": "1",  // Provider ID
+    "gameId": "181818"  // Game ID
   }
 }
 ```
@@ -173,16 +173,16 @@
 
 ---
 
-### 4.4 Get User Balance（获取用户余额）
+### 4.4 Get User Balance
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/user/balance`
+- **Method:** `POST`
+- **Path:** `/game-proxy/user/balance`
 
 **Request Headers**
 
-| 参数   | 说明 |
-|--------|------|
-| token  | jwt |
+| Parameter | Description |
+|-----------|-------------|
+| token     | jwt |
 
 **Request Body**
 
@@ -192,9 +192,9 @@
   "id": "req-001",
   "method": "user.balance",
   "params": {
-    "a0": "1111111",
-    "userId": 123123,
-    "currency": "RMB"
+    "a0": "1111111",  // Root agent
+    "userId": 123123,  // User ID
+    "currency": "GOLD"  // Currency: GOLD=free, VND/USD=real money
   }
 }
 ```
@@ -207,10 +207,10 @@
   "id": "req-001",
   "method": "user.balance",
   "result": {
-    "a0": 100841,
-    "userId": 100821,
-    "currency": "RMB",
-    "score": "100.00"
+    "a0": 100841,  // Root agent
+    "userId": 100821,  // User ID
+    "currency": "GOLD",  // Currency: GOLD=free, VND/USD=real money
+    "score": "100.00"  // Amount
   },
   "error": null
 }
@@ -218,14 +218,14 @@
 
 ---
 
-## 5. 游戏端提供的 API
+## 5. Game-Side APIs
 
-以下接口由游戏端实现并对外提供，供 Game Center 调用。
+The following APIs are implemented and exposed by the game side for Game Center to call.
 
-### 5.1 Query Game Statistics Interface（游戏统计查询）
+### 5.1 Query Game Statistics Interface
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/game/order/stat`
+- **Method:** `POST`
+- **Path:** `/game-proxy/game/order/stat`
 
 **Request Body**
 
@@ -235,19 +235,23 @@
   "id": "req-001",
   "method": "game.order.stat",
   "params": {
-    "a0": 19191,
-    "userIds": [199817, 12123],
-    "currency": "RNB",
-    "isSettle": 0,
-    "state": [],
-    "gameInfo": { "category": "0", "providerId": "1", "gameId": "101891" },
-    "groupId": "DEF",
-    "beginTime": "YYYY-MM-DD HH:mm:ss",
-    "endTime": "YYYY-MM-DD HH:mm:ss",
-    "timezone": 0,
+    "a0": 19191,  // Root agent, required
+    "userIds": [199817, 12123],  // User IDs, optional
+    "currency": "GOLD",  // Currency, required
+    "isSettle": 0,  // Is settled: 0=No 1=Yes, optional
+    "state": [],  // State 0,1,2,3,4,5,7, optional
+    "gameInfo": {
+        "category": "0",  // Game category ID, optional
+        "providerId": "1",  // Game provider ID, required
+        "gameId": "101891"  // Game ID, optional
+    },
+    "groupId": "DEF",  // groupId, default DEF, optional
+    "beginTime": "YYYY-MM-DD HH:mm:ss",  // Start time, required
+    "endTime": "YYYY-MM-DD HH:mm:ss",  // End time, required
+    "timezone": 0,  // 0=Singapore 1=US Eastern, required
     "page": 1,
     "size": 100,
-    "hasStat": 0
+    "hasStat": 0  // Need total: 0=No 1=Yes, required
   }
 }
 ```
@@ -259,19 +263,19 @@
   "jsonrpc": "2.0",
   "id": "req-001",
   "result": {
-    "total": 100,
-    "totalBetScore": 0,
-    "totalSettleScore": 0,
-    "totalValidScore": 0,
+    "total": 100,  // Total count
+    "totalBetScore": 0,  // Total bet amount
+    "totalSettleScore": 0,  // Total settle amount
+    "totalValidScore": 0,  // Total valid bet amount
     "list": [
       {
-        "gameId": "1",
-        "groupId": "1",
-        "currency": "RMB",
-        "betScore": 100.0,
-        "settleScore": 100.0,
-        "validScore": 100.0,
-        "userId": 100211
+        "gameId": "1",  // Game ID
+        "groupId": "1",  // Room/group ID
+        "currency": "RMB",  // Currency
+        "betScore": 100.0,  // Bet amount
+        "settleScore": 100.0,  // Payout amount
+        "validScore": 100.0,  // Valid bet
+        "userId": 100211  // User ID
       }
     ]
   },
@@ -281,16 +285,16 @@
 
 ---
 
-### 5.2 Query Game Order Interface（游戏订单查询）
+### 5.2 Query Game Order Interface
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/game/order/query`
+- **Method:** `POST`
+- **Path:** `/game-proxy/game/order/query`
 
 **Request Headers**
 
-| 参数   | 说明 |
-|--------|------|
-| token  | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
+| Parameter | Description |
+|-----------|-------------|
+| token     | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
 
 **Request Body**
 
@@ -300,20 +304,24 @@
   "id": "req-001",
   "method": "game.order.query",
   "params": {
-    "orderId": "1213123213",
-    "a0": 19191,
-    "userId": 199817,
-    "currency": "RNB",
-    "state": [0],
-    "gameInfo": { "category": "0", "providerId": "1", "gameId": "101891" },
-    "returnGameInfo": 0,
-    "groupId": "sdfs",
-    "beginTime": "YYYY-MM-DD HH:mm:ss",
-    "endTime": "YYYY-MM-DD HH:mm:ss",
-    "timeZone": 0,
+    "orderId": "1213123213",  // Order ID, optional
+    "a0": 19191,  // Root node ID, required
+    "userId": 199817,  // User ID, optional
+    "currency": "GOLD",  // Currency, required
+    "state": [0],  // State: 0 Unsettled, 1 Win, 2 Draw, 3 Loss, 4 User Cancelled, 5 System Cancelled, 7 Abnormal, optional
+    "gameInfo": {
+        "category": "0",  // Game category ID, optional
+        "providerId": "1",  // Game provider ID, required
+        "gameId": "101891"  // Game ID, optional
+    },
+    "returnGameInfo": 0,  // Return order detail: 0=No 1=Yes, required
+    "groupId": "sdfs",  // groupId, default DEF, optional
+    "beginTime": "YYYY-MM-DD HH:mm:ss",  // Start time, required
+    "endTime": "YYYY-MM-DD HH:mm:ss",  // End time, required
+    "timeZone": 0,  // 0=Singapore 1=US Eastern, required
     "page": 1,
     "size": 100,
-    "hasStat": 0
+    "hasStat": 0  // Need total: 0=No 1=Yes, required
   }
 }
 ```
@@ -325,25 +333,25 @@
   "jsonrpc": "2.0",
   "id": "req-001",
   "result": {
-    "total": 100,
-    "totalBetScore": 0,
-    "totalSettleScore": 0,
-    "totalValidScore": 0,
+    "total": 100,  // Total count
+    "totalBetScore": 0,  // Total bet amount
+    "totalSettleScore": 0,  // Total settle amount
+    "totalValidScore": 0,  // Total valid bet amount
     "list": [
       {
         "a0": "12313",
-        "userId": "324324",
-        "gameId": "1",
-        "orderId": "2342342",
-        "currency": "RMB",
-        "betTime": "YYYY-MM-DD HH:mm:ss",
-        "state": 1,
-        "betScore": 100.0,
-        "settleScore": 100.0,
-        "validScore": 100.0,
-        "settleTime": "YYYY-MM-DD HH:mm:ss",
-        "groupId": "2322",
-        "isSettle": 0,
+        "userId": "324324",  // User ID
+        "gameId": "1",  // Game ID
+        "orderId": "2342342",  // Order ID
+        "currency": "GOLD",  // Currency
+        "betTime": "YYYY-MM-DD HH:mm:ss",  // Bet time
+        "state": 1,  // State: 0 Unsettled, 1 Win, 2 Draw, 3 Loss, 4 User Cancelled, 5 System Cancelled, 7 Abnormal
+        "betScore": 100.0,  // Bet amount
+        "settleScore": 100.0,  // Payout amount
+        "validScore": 100.0,  // Valid bet
+        "settleTime": "YYYY-MM-DD HH:mm:ss",  // Settle time
+        "groupId": "2322",  // Group ID
+        "isSettle": 0,  // Is settled: 0=No 1=Yes (state 1,2,3)
         "gameInfo": {}
       }
     ]
@@ -352,20 +360,20 @@
 }
 ```
 
-（state：0 未结算 / 1 赢 / 2 和 / 3 输 / 4 用户取消 / 5 系统取消 / 7 异常）
+(state: 0 Unsettled / 1 Win / 2 Draw / 3 Loss / 4 User Cancelled / 5 System Cancelled / 7 Abnormal)
 
 ---
 
-### 5.3 Query Order Detail Interface（订单详情查询）
+### 5.3 Query Order Detail Interface
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/game/order/detail`
+- **Method:** `POST`
+- **Path:** `/game-proxy/game/order/detail`
 
 **Request Headers**
 
-| 参数   | 说明 |
-|--------|------|
-| token  | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
+| Parameter | Description |
+|-----------|-------------|
+| token     | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
 
 **Request Body**
 
@@ -396,17 +404,17 @@
 
 ---
 
-### 5.4 Get Game URL（获取游戏链接）
+### 5.4 Get Game URL
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/game/url`
+- **Method:** `POST`
+- **Path:** `/game-proxy/game/url`
 
 **Request Headers**
 
-| 参数         | 说明 |
-|--------------|------|
+| Parameter    | Description |
+|--------------|-------------|
 | Content-Type | application/json |
-| token        | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3（生成方式见：https://pb-api-doc.pwtk.cc/project/253/wiki） |
+| token        | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 (See: https://pb-api-doc.pwtk.cc/project/253/wiki) |
 
 **Request Body**
 
@@ -416,15 +424,19 @@
   "id": "req-001",
   "method": "game.url",
   "params": {
-    "token": "sdfdsfdsfsd",
-    "device": "PC",
-    "language": "CN",
-    "currency": "RNB",
-    "groupId": "1000",
-    "isGroupTrace": 0,
-    "isDemo": 0,
-    "gameInfo": { "category": "0", "providerId": "1", "gameId": "101891" },
-    "returnUrl": ""
+    "token": "sdfdsfdsfsd",  // User token, required
+    "device": "PC",  // Terminal, required: PC, H5
+    "language": "zh-CN",  // Language, required
+    "currency": "GOLD",  // Currency, required
+    "groupId": "1000",  // Group ID, default DEF, optional; required when isGroupTrace=1
+    "isGroupTrace": 0,  // 0=No tracking (default), 1=Tracking (must set groupId)
+    "isDemo": 0,  // Is demo: 0=No 1=Yes, required
+    "gameInfo": {
+        "category": "0",  // Game category ID, required
+        "providerId": "1",  // Game provider ID, required
+        "gameId": "101891"  // Game ID, optional
+    },
+    "returnUrl": ""  // Return URL, optional
   }
 }
 ```
@@ -436,7 +448,7 @@
   "jsonrpc": "2.0",
   "id": "req-001",
   "result": {
-    "url": "https://www.ddf.com",
+    "url": "https://www.ddf.com",  // Game entry URL
     "config": {}
   },
   "error": null
@@ -445,37 +457,105 @@
 
 ---
 
-### 5.5 Order Collection Interface（订单汇总接口）
+### 5.5 Order Collection Interface
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/game/order/collect`
+- **Method:** `POST`
+- **Path:** `/game-proxy/game/order/collect`
 
 **Request Headers**
 
-| 参数         | 说明 |
-|--------------|------|
-| Content-Type | application/json |
+| Parameter    | Description         |
+|--------------|---------------------|
+| Content-Type | application/json    |
 
 **Request Body**
 
-请求格式为 JSON-RPC，参数包括：startTime、endTime、pageNum、pageSize、providerId、categoryId、gameId、timeZone（0 北京时间 / 1 美东时间）等。
+Request format is JSON-RPC. Example:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "method": "game.order.collect",
+  "params": {
+    "startTime": "YYYY-MM-DD HH:mm:ss",
+    "endTime": "YYYY-MM-DD HH:mm:ss",
+    "pageNum": 1,
+    "pageSize": 100,
+    "providerId": "1",
+    "categoryId": "0",
+    "gameId": "101891",
+    "timeZone": 0
+  }
+}
+```
+
+| Parameter   | Type   | Description                              |
+|-------------|--------|------------------------------------------|
+| startTime   | string | Start time                               |
+| endTime     | string | End time                                 |
+| pageNum     | number | Page number                              |
+| pageSize    | number | Page size                                |
+| providerId  | string | Game provider ID (optional)              |
+| categoryId  | string | Game category ID (optional)              |
+| gameId      | string | Game ID (optional)                       |
+| timeZone    | number | Timezone: 0 Beijing Time / 1 US Eastern  |
 
 **Response Body**
 
-分页数据，字段包括：a0、userId、providerId、categoryId、gameId、groupId、orderId、betScore、effectScore、settleScore、status、betTime、settleTime、gameInfo、currency 等。
+Returns paginated data. Example:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-001",
+  "result": {
+    "total": 100,
+    "list": [
+      {
+        "a0": "string",
+        "userId": "string",
+        "providerId": "string",
+        "categoryId": "string",
+        "gameId": "string",
+        "groupId": "string",
+        "orderId": "string",
+        "betScore": "string",
+        "effectScore": "string",
+        "settleScore": "string",
+        "status": "string",
+        "betTime": "string",
+        "settleTime": "string",
+        "gameInfo": "string",
+        "currency": "string"
+      }
+    ]
+  },
+  "error": null
+}
+```
+
+| Field        | Description    |
+|--------------|----------------|
+| total        | Total count    |
+| list         | Order list     |
+| betScore     | Bet amount     |
+| effectScore  | Valid bet      |
+| settleScore  | Settle amount  |
+| status       | Order status   |
 
 ---
 
-### 5.6 Exit Game（退出游戏）
+### 5.6 Exit Game
 
-- **方法**：`POST`
-- **路径**：`/game-proxy/game/exit`
+- **Method:** `POST`
+- **Path:** `/game-proxy/game/exit`
 
 **Request Headers**
 
-| 参数   | 说明 |
-|--------|------|
-| token  | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
+| Parameter | Description |
+|-----------|-------------|
+| token     | 70d79fa3-e2f4-46ae-9b28-bbee4cd795b3 |
 
 **Request Body**
 
@@ -509,11 +589,11 @@
 
 ---
 
-## 6. 请求鉴定权：通过 JWT Token 的方式
+## 6. Request Authentication: JWT Token
 
-接口请求需在请求头中携带 JWT Token 进行身份鉴定。调用方需在 **Request Headers** 中增加 `token` 字段，取值为有效的 JWT Token。服务端将校验该 Token 的合法性与有效性，校验通过后方可访问对应接口。
+API requests must carry a JWT Token in the request header for authentication. The caller must add a `token` field in **Request Headers** with a valid JWT Token. The server will verify the token; only valid tokens are allowed to access the APIs.
 
-### Token 生成 Demo
+### Token Generation Demo
 
 ```java
 public String getToken() {
